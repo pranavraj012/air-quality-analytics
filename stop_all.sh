@@ -12,6 +12,7 @@ set -uo pipefail
 . "$(dirname "$0")/env.sh"
 
 echo "Stopping YARN..."
+mapred --daemon stop historyserver 2>&1 | grep -v "^WARNING" || true
 yarn --daemon stop resourcemanager 2>&1 | grep -v "^WARNING" || true
 yarn --daemon stop nodemanager 2>&1 | grep -v "^WARNING" || true
 

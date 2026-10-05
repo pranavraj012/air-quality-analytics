@@ -25,6 +25,14 @@ sleep 5
 yarn --daemon start nodemanager
 sleep 5
 
+# The JobHistory Server is not optional in practice. Pig queries it on port
+# 10020 for job statistics AFTER a job has already succeeded; without it Pig
+# retries ten times and stalls, adding minutes of dead time to every run
+# even though the results were written correctly.
+echo "Starting JobHistory Server..."
+mapred --daemon start historyserver
+sleep 5
+
 echo
 echo "HDFS:"
 hdfs dfsadmin -report | head -4

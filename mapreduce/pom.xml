@@ -17,8 +17,14 @@
   </description>
 
   <properties>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <!-- Target Java 8 bytecode (major version 52), not the building JDK's
+         level. YARN launches every container on Java 8 in this project
+         (see yarn-env.sh), because Hive 3.1.3's own MapReduce containers need
+         Java 8 for its Kryo 3.0.3. A jar compiled to major version 55 could
+         not load there at all. The MapReduce API itself is Java 8 compatible;
+         only the bytecode level had to be lowered. -->
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 

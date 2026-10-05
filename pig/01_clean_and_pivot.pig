@@ -154,14 +154,25 @@ timed = FOREACH located {
 -- 1 mg/m3 = 1000 ug/m3
 --
 -- Split into two branches because Pig 0.17 has no ternary operator. Only CO
--- is published in mg/m3 among the six core pollutants, so this is a
--- two-way split rather than a lookup table.
-in_mg = FOREACH (FILTER timed BY unit == 'mg/m3') {
+-- is published in mg/m3 among the six core pollutants, so this is a two-way
+-- split rather than a lookup table.
+--
+-- MATCHING THE UNIT IS SUBTLE. The source writes the unit as UTF-8: "mg/m3"
+-- with a superscript three is the bytes "mg/m" followed by 0xC2 0xB3, NOT the
+-- seven ASCII characters "mg/m3". Comparing against the literal 'mg/m3'
+-- therefore never matches, and the conversion silently does nothing -- the
+-- job still succeeds and CO still arrives as 0.82 instead of 820.
+--
+-- The reliable test is ASCII-only: the first four characters of any mg/m3 unit
+-- are exactly "mg/m", and of any ug/m3 unit exactly "ug/m". Matching
+-- SUBSTRING(unit, 0, 4) avoids the encoding problem entirely.
+-- run_subset.sh asserts the converted value so this cannot regress silently.
+in_mg = FOREACH (FILTER timed BY SUBSTRING(unit, 0, 4) == 'mg/m') {
     GENERATE station_id, state, city, parameter_name, collected_at,
              year, month, day, hour, reading * 1000.0 AS reading, source;
 };
 
-in_ug = FOREACH (FILTER timed BY unit != 'mg/m3') {
+in_ug = FOREACH (FILTER timed BY SUBSTRING(unit, 0, 4) != 'mg/m') {
     GENERATE station_id, state, city, parameter_name, collected_at,
              year, month, day, hour, reading, source;
 };

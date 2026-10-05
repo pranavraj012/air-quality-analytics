@@ -110,10 +110,22 @@ distance) and would distort any per-pollutant average.
 Conversion: `1 mg/m³ = 1000 µg/m³`, applied in Pig:
 
 ```pig
-in_mg = FOREACH (FILTER timed BY unit == 'mg/m3') {
+in_mg = FOREACH (FILTER timed BY SUBSTRING(unit, 0, 4) == 'mg/m') {
     GENERATE ..., reading * 1000.0 AS reading, ...;
 }
 ```
+
+**The unit must be matched on bytes, not characters.** The source writes the
+unit as UTF-8: `mg/m³` is the bytes `m g / m` followed by `0xC2 0xB3` — that is
+"mg/m" plus a two-byte superscript three, **not** the seven ASCII characters
+`mg/m3`. An earlier version compared against the literal `'mg/m3'`, which never
+matched anything. The job still succeeded, `_SUCCESS` was still written, and CO
+silently passed through unconverted at 0.82 instead of 820. Nothing in the exit
+status or the row counts revealed it; it was caught by an assertion in
+`run_subset.sh` that checks the converted value directly.
+
+Matching `SUBSTRING(unit, 0, 4)` against `'mg/m'` is ASCII-only and therefore
+immune to the encoding.
 
 After conversion **every pollutant column in the pipeline is in µg/m³**, which
 is what makes the six features mutually comparable.

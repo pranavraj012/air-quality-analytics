@@ -6,7 +6,7 @@ Exact commands to build the environment from scratch on WSL2 Ubuntu 24.04.
 
 ```bash
 sudo apt-get update
-sudo apt-get install -y openjdk-11-jdk-headless openjdk-8-jdk-headless maven libsnappy1v5
+sudo apt-get install -y openjdk-8-jdk-headless maven libsnappy1v5
 ```
 
 **`libsnappy1v5`, not `libsnappy1`.** Ubuntu 24.04 (Noble) renamed the package.
@@ -18,14 +18,29 @@ compressor and only logs a warning — so it can be dropped entirely.
 Verify:
 
 ```bash
-java -version   # expect 21 (the system default; env.sh switches this)
-javac -version  # expect 11.0.x
-mvn -version    # expect 3.8.x
+java -version   # expect 1.8.0 after sourcing env.sh
+javac -version  # expect 1.8.0
+mvn -version    # expect 3.8.x, running on Java 1.8.0
 ```
 
+**Why Java 8 and not a newer JDK.** It is required, not preferred:
+
+- Hive 3.1.3's CLI casts the system classloader to `java.net.URLClassLoader`,
+  removed in Java 9 ([HIVE-25496](https://issues.apache.org/jira/browse/HIVE-25496)).
+- Hive's own MapReduce containers load Kryo 3.0.3, which reflects on
+  `java.util.ArrayList` internals that moved in Java 9. On Java 11 every Hive
+  job dies with `NoSuchFieldException: parentOffset`.
+- Hadoop 3.3.6 supports Java 8 and 11, so Java 8 costs nothing there.
+- The MapReduce job targets Java 8 bytecode (`maven.compiler.target=8`), so
+  Maven builds and runs it under this same JDK.
+
 The box may already have a Java 21 JRE with **no compiler**. That is fine:
-`env.sh` puts Java 11 first on `PATH`, and Hadoop needs `javac` only for the
-Maven build.
+`env.sh` puts Java 8 first on `PATH`. Java 11 can be removed once nothing
+depends on it:
+
+```bash
+sudo apt-get remove openjdk-11-jdk-headless
+```
 
 ## 2. Download the Hadoop ecosystem
 
@@ -138,20 +153,34 @@ Those `$HADOOP_MAPRED_HOME` tokens only expand if the variable is visible
 ```xml
 <property>
   <name>yarn.app.mapreduce.am.env</name>
-  <value>JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64,HADOOP_MAPRED_HOME=/home/pranav/hadoop</value>
+  <value>HADOOP_MAPRED_HOME=/home/pranav/hadoop</value>
 </property>
 <property>
   <name>mapreduce.map.env</name>
-  <value>JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64,HADOOP_MAPRED_HOME=/home/pranav/hadoop</value>
+  <value>HADOOP_MAPRED_HOME=/home/pranav/hadoop</value>
 </property>
 <property>
   <name>mapreduce.reduce.env</name>
-  <value>JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64,HADOOP_MAPRED_HOME=/home/pranav/hadoop</value>
+  <value>HADOOP_MAPRED_HOME=/home/pranav/hadoop</value>
 </property>
 ```
 
-Without `HADOOP_MAPRED_HOME` set this way Hadoop prints a helpful error naming
-the missing property, and the job fails.
+**Do not pin `JAVA_HOME` here.** The container JVM is set in `yarn-env.sh`, not
+in `mapred-site.xml`. Pinning it in both places previously forced Hive's
+containers onto the wrong JDK:
+
+```
+/home/pranav/hadoop/etc/hadoop/yarn-env.sh
+export YARN_JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+```
+
+YARN takes the container JVM from `yarn-env.sh`, not from the shell that
+submitted the job — so that single file is the one place both tools agree on.
+
+`/home/pranav/hive/lib/*` is also appended to each classpath above so Hive's own
+MapReduce tasks can load Hive jars inside the container. A plain `hadoop jar`
+run ignores the extra entry.
 
 ### Hive configuration
 
