@@ -105,14 +105,37 @@ hadoop jar mapreduce/target/city-pollutant-stats.jar \
 
 # ---------------------------------------------------------------------------
 step "8. Hive"
-hive -f hive/create_tables.hql 2>/dev/null \
-    || echo "NOTE: the 'hive' CLI fails on Java 11 (ClassCastException in CliDriver)."
-echo "If Hive cannot be started, the analytics in analysis.hql are also"
-echo "implemented in Python and produce the same result files."
+# Failures here used to be swallowed: the output was sent to /dev/null, the
+# non-zero exit was replaced with a NOTE, and the stage that actually produces
+# results/pollutant_stats.csv (statistics/hive_equivalent.py, below) was never
+# invoked. A transient YARN failure therefore left stale CSVs in results/
+# that looked like fresh output. Errors are surfaced now and the stage is
+# allowed to fail loudly.
+if timeout 900 hive -f hive/create_tables.hql > /tmp/hive_ddl.log 2>&1; then
+    echo "  tables created"
+    # analysis.hql is the slowest step (fifteen CORR calls over the wide
+    # table). Its outputs duplicate hive_equivalent.py, so if it fails the
+    # pipeline still completes with correct numbers.
+    if timeout 3600 hive -f hive/analysis.hql > /tmp/hive_analysis.log 2>&1; then
+        echo "  analysis.hql completed"
+    else
+        echo "  NOTE: analysis.hql failed; hive_equivalent.py below produces"
+        echo "        the same result files. See /tmp/hive_analysis.log"
+    fi
+else
+    fail "Hive create_tables.hql failed -- see /tmp/hive_ddl.log"
+    grep -m3 -E "^FAILED|Exception" /tmp/hive_ddl.log 2>/dev/null | sed 's/^/        /'
+fi
 
 # ---------------------------------------------------------------------------
 step "9. Statistics"
 "$VENV_PY" statistics/descriptive.py
+
+# The SQL-equivalent analytics. This is what writes results/pollutant_stats.csv,
+# results/city_pm25.csv, results/monthly.csv, results/hourly_profile.csv,
+# results/correlation.csv and results/station_features.csv -- the files the
+# charts read. It must run whether or not Hive succeeded.
+"$VENV_PY" statistics/hive_equivalent.py
 
 # ---------------------------------------------------------------------------
 step "10. K-means"

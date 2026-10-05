@@ -29,6 +29,10 @@ These come from the project's own outputs, not from literature.
   National Capital Region neighbours occupy the top four positions.
 - **PM2.5 and PM10 correlate at r = 0.839.** Fine and coarse particulate move
   together, as expected from a shared combustion source.
+- **CO tracks the traffic pollutants: r = 0.411 with PM10 and 0.358 with NO₂,
+  while Ozone is essentially uncorrelated with every particulate (|r| < 0.07).**
+  Ozone forms in sunlight and is destroyed by the nitrogen oxides traffic
+  emits, so it behaves inversely to the combustion pollutants.
 - **Winter is the polluted season and the monsoon is the clean one.** Mean PM2.5
   peaks at 86.8 in November and 85.4 in January, and falls to 21.6 in August —
   a fourfold seasonal swing driven by monsoon rain scavenging particles.

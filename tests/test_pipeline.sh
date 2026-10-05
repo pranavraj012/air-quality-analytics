@@ -207,10 +207,23 @@ if len(clusters) > len(features):
 if clusters["cluster"].nunique() < 2:
     problems.append("K-means produced a single cluster")
 
-# The 99th-percentile readings should be plausible, not absurd.
-big = stats["max_value"].max()
-if big > 5000:
-    problems.append(f"suspicious max value: {big}")
+# Plausibility ceiling on the maximum reading.
+#
+# The threshold is per pollutant, not a single global number. It used to be a
+# flat 5000, written back when CO was still in mg/m3 and so topping out near
+# 48. After the conversion to ug/m3 a legitimate CO maximum is ~48,280, which
+# tripped the old limit and produced a false failure.
+#
+# CPCB's own reporting ceiling is 1000 ug/m3 for particulates. CO is allowed a
+# higher bound because it is a true conversion of the source's mg/m3 values,
+# not a clipped reading.
+LIMITS = {"PM2.5": 1000.5, "PM10": 1000.5, "NO2": 1000.0,
+          "SO2": 500.0, "CO": 100000.0, "Ozone": 1000.0}
+for _, row in stats.iterrows():
+    limit = LIMITS.get(row["pollutant"])
+    if limit is not None and row["max_value"] > limit:
+        problems.append(
+            f"{row['pollutant']} max {row['max_value']} exceeds {limit}")
 
 if problems:
     print("  FAIL  numerical sanity")
