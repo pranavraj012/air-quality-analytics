@@ -88,12 +88,25 @@ hdfs dfs -cat '/airquality/results/mr/part-*' | grep -P "^Delhi\t"
 ```
 
 ```
-Delhi   CO      321818   1.2878   0.0000   48.2800
-Delhi   NO2     325379  42.7990   0.0100  497.6000
-Delhi   PM10    323061 212.6148   0.0500 1000.0000
-Delhi   PM2.5   317627 105.0936   0.0200 1000.0000
-Delhi   SO2     265448  14.9487   0.0100  193.1000
+Delhi	CO	321818	1.2878	0.0000	48.2800
+Delhi	NO2	325379	42.7990	0.0100	497.6000
+Delhi	Ozone	318829	33.9346	0.0100	489.4000
+Delhi	PM10	323061	212.6148	0.0500	1000.0000
+Delhi	PM2.5	317627	105.0936	0.0200	1000.0000
+Delhi	SO2	265448	14.9487	0.0100	193.1000
 ```
+
+> **If an examiner asks why CO is 1.29 while everything else is in µg/m³:**
+> this job reads the *raw* CSV and applies only the pollutant filter — it does
+> not convert units. CO here is in **mg/m³**, so its true value is
+> 1.2878 mg/m³ = **1,287.8 µg/m³**. The conversion happens in the Pig ETL, and
+> every figure in `docs/results.md` comes from converted data. The MapReduce
+> output is used to demonstrate the aggregation and the row-count
+> reconciliation, not as a source of unit-consistent statistics.
+>
+> This asymmetry is deliberate and worth stating: it is exactly why
+> `tests/test_pipeline.sh` reconciles **row counts** between Pig and MapReduce
+> while the **unit-consistent averages** come from Hive and Python.
 
 > "The Mapper emits a partial aggregate per row keyed on city and pollutant; the
 > shuffle groups and spills those to disk; the Reducer merges each group. Count

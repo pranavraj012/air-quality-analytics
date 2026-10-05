@@ -83,18 +83,18 @@ All µg/m³.
 
 | Month | PM2.5 | PM10 | NO2 | SO2 | CO | Ozone |
 |---|---|---|---|---|---|---|
-| Jan | 85.4 | 155.5 | 27.5 | 13.4 | 1.06 | 27.6 |
-| Feb | 58.6 | 122.9 | 26.8 | 13.6 | 0.89 | 32.7 |
-| Mar | 48.4 | 111.7 | 24.2 | 13.9 | 0.81 | 36.5 |
-| Apr | 45.4 | 115.5 | 23.5 | 14.0 | 0.77 | 40.7 |
-| May | 45.2 | 115.4 | 21.4 | 13.5 | 0.78 | 42.6 |
-| Jun | 34.5 | 91.5 | 18.0 | 11.8 | 0.68 | 34.8 |
-| Jul | 24.1 | 56.9 | 15.5 | 10.2 | 0.64 | 24.1 |
-| **Aug** | **21.6** | 50.6 | 14.6 | 10.2 | 0.61 | 21.6 |
-| Sep | 26.4 | 62.2 | 15.4 | 10.1 | 0.62 | 23.0 |
-| Oct | 49.7 | 107.6 | 21.3 | 11.0 | 0.79 | 28.0 |
-| **Nov** | **86.8** | 163.2 | 27.9 | 13.3 | 1.05 | 33.0 |
-| Dec | 71.3 | 136.5 | 29.1 | 13.0 | 0.95 | 31.2 |
+| Jan | 85.4 | 155.5 | 27.5 | 13.4 | 1060.1 | 27.6 |
+| Feb | 58.6 | 122.9 | 26.8 | 13.6 | 886.1 | 32.7 |
+| Mar | 48.4 | 111.7 | 24.2 | 13.9 | 807.5 | 36.5 |
+| Apr | 45.4 | 115.5 | 23.5 | 14.0 | 765.3 | 40.7 |
+| May | 45.2 | 115.4 | 21.4 | 13.5 | 781.1 | 42.6 |
+| Jun | 34.5 | 91.5 | 18.0 | 11.8 | 683.9 | 34.8 |
+| Jul | 24.1 | 56.9 | 15.5 | 10.2 | 643.6 | 24.1 |
+| **Aug** | **21.6** | 50.6 | 14.6 | 10.2 | 611.2 | 21.6 |
+| Sep | 26.4 | 62.2 | 15.4 | 10.1 | 620.5 | 23.0 |
+| Oct | 49.7 | 107.6 | 21.3 | 11.0 | 792.9 | 28.0 |
+| **Nov** | **86.8** | 163.2 | 27.9 | 13.3 | 1045.9 | 33.0 |
+| Dec | 71.3 | 136.5 | 29.1 | 13.0 | 948.7 | 31.2 |
 
 **PM2.5 swings fourfold across the year: 86.8 in November versus 21.6 in August.**
 The pattern is the Indian monsoon — winter has cool, stagnant air with weak
@@ -111,8 +111,8 @@ high — the same mechanism visible in the correlation matrix.
 
 | | PM2.5 | CO |
 |---|---|---|
-| **Peak** | 22:00 IST — 59.0 µg/m³ | 19:00 IST — 1.06 µg/m³ |
-| **Minimum** | 16:00 IST — 39.8 µg/m³ | 15:00 IST — 0.64 µg/m³ |
+| **Peak** | 22:00 IST — 59.0 µg/m³ | 20:00 IST — 1060.7 µg/m³ |
+| **Minimum** | 16:00 IST — 39.8 µg/m³ | 15:00 IST — 658.4 µg/m³ |
 
 The two pollutants peak at different hours. PM2.5 accumulates through the day and
 peaks late evening, while CO — a direct traffic emission rather than an
@@ -230,8 +230,8 @@ that measure PM2.5 only).
 
 | Cluster | Stations | PM2.5 | PM10 | NO2 | SO2 | CO | Ozone | Cities |
 |---|---|---|---|---|---|---|---|---|
-| **0 — higher** | 107 | **81.4** | 175.7 | 38.0 | 15.3 | 1.25 | 36.7 | 48 |
-| **1 — lower** | 376 | 39.8 | 87.1 | 17.6 | 11.6 | 0.67 | 28.3 | 201 |
+| **0 — higher** | 107 | **81.4** | 175.7 | 38.0 | 15.3 | 1250.7 | 36.7 | 48 |
+| **1 — lower** | 376 | 39.8 | 87.1 | 17.6 | 11.6 | 672.5 | 28.3 | 201 |
 
 Cluster 0 is roughly **twice as polluted as cluster 1 on every combustion
 pollutant**, but its stations span 48 cities — so the split is not a simple

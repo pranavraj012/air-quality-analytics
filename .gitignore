@@ -4,6 +4,11 @@
 # Tooling
 .commandcode/
 
+# Personal study aid, not part of the deliverable. Walks through every
+# concept the project uses and every bug that shaped it. The committed
+# documentation lives in docs/; this file is for reading, not for grading.
+CONCEPTS.md
+
 # Downloaded and derived data (large; regenerate with scripts/)
 data/raw/
 data/sample/
