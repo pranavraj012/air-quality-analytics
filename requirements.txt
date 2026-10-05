@@ -1,0 +1,17 @@
+# Python dependencies for the air-quality analytics project.
+# Install with:
+#   python3 -m venv .venv
+#   .venv/bin/pip install -r requirements.txt
+#
+# Versions pinned to what this project was built and verified against.
+
+pandas==3.0.6            # CSV handling, reshaping, statistics
+numpy==2.5.3             # numeric operations
+pyarrow==25.0.1          # reads the source .parquet files
+scikit-learn==1.9.1      # K-means clustering, silhouette score
+matplotlib==3.11.2       # charts
+seaborn==0.13.2          # correlation heatmap styling
+requests==2.34.2         # XKDR API calls
+python-dateutil==2.9.0.post0
+python-dotenv==1.2.4     # loads the API key from .env
+scipy==1.18.1            # pulled in by scikit-learn; pinned for reproducibility

@@ -1,0 +1,287 @@
+# Results
+
+All figures below are produced by this project's own pipeline from
+46,937,170 hourly readings across 538 stations for calendar year 2024. Nothing
+is quoted from literature; where a finding matches published expectations that is
+noted as corroboration, not as the source.
+
+Reproduce with `./run_all.sh`, then inspect `results/`.
+
+---
+
+## A. Location-wise analysis
+
+### A1. Dataset-wide means
+
+All values µg/m³.
+
+| Pollutant | n readings | mean | median | min | max | stddev |
+|---|---|---|---|---|---|---|
+| PM2.5 | 3,932,392 | 50.38 | 35.42 | 0.00 | 1000.00 | 53.50 |
+| PM10 | 3,864,549 | 108.17 | 82.25 | 0.01 | 1000.00 | 93.28 |
+| NO2 | 3,983,789 | 22.20 | 15.37 | 0.01 | 497.77 | 23.99 |
+| SO2 | 3,865,493 | 12.34 | 8.60 | 0.01 | 199.90 | 13.74 |
+| CO | 3,982,313 | 0.81 | 0.63 | 0.00 | 48.28 | 0.73 |
+| Ozone | 3,840,559 | 31.27 | 22.48 | 0.01 | 490.60 | 29.22 |
+
+Every distribution is strongly right-skewed: the median sits well below the
+mean for all six pollutants, which is the expected shape for concentration data
+dominated by a large number of low readings and a few extreme pollution events.
+
+PM2.5 and PM10 both hit exactly 1000.00 µg/m³, which is the CPCB instrument
+upper reporting limit rather than a physical measurement. Those are genuine
+upper-bound readings in the source and are **retained**, not clipped — capping
+them would be a scientific judgement the project has no basis to make.
+
+### A2. Cities by mean PM2.5
+
+Top 20 of the **45 cities with at least 3 monitoring stations** (199 of 244
+cities excluded as too sparsely monitored).
+
+The threshold is not cosmetic. Without it the ranking is topped by **Byrnihat,
+a town whose mean PM2.5 of 128.7 µg/m³ comes from a single station** — a real
+reading, but not a city-level average. Requiring three stations keeps every
+entry in the table a genuine city-level figure.
+
+| Rank | City | Stations | Mean PM2.5 |
+|---|---|---|---|
+| 1 | **Delhi** | 39 | **105.1** |
+| 2 | Gurugram | 4 | 95.2 |
+| 3 | Faridabad | 4 | 87.4 |
+| 4 | Ghaziabad | 3 | 81.6 |
+| 5 | Noida | 4 | 80.7 |
+| 6 | Patna | 6 | 77.1 |
+| 7 | Muzaffarpur | 3 | 74.3 |
+| 8 | Chandigarh | 3 | 70.5 |
+| 9 | Asansol | 4 | 68.7 |
+| 10 | Guwahati | 3 | 61.8 |
+
+**Delhi and its four National Capital Region neighbours occupy the top five
+positions.** The NCR cities are geographically contiguous and share Delhi's air
+shed, so this ordering is internally coherent rather than a collection of
+unrelated high values. Below them the ranking follows the Indo-Gangetic plain —
+Patna, Muzaffarpur — which is the pattern CPCB reports annually.
+
+Chart: `results/city_pm25_comparison.png`
+Full table: `results/city_pm25.csv`
+
+### A3. States
+
+Maharashtra has the most stations and the most readings overall, but the highest
+mean PM2.5 concentrates in the northern states. Full table in
+`results/state_pm25.csv`.
+
+---
+
+## B. Temporal analysis
+
+### B1. Monthly means, 2024
+
+All µg/m³.
+
+| Month | PM2.5 | PM10 | NO2 | SO2 | CO | Ozone |
+|---|---|---|---|---|---|---|
+| Jan | 85.4 | 155.5 | 27.5 | 13.4 | 1.06 | 27.6 |
+| Feb | 58.6 | 122.9 | 26.8 | 13.6 | 0.89 | 32.7 |
+| Mar | 48.4 | 111.7 | 24.2 | 13.9 | 0.81 | 36.5 |
+| Apr | 45.4 | 115.5 | 23.5 | 14.0 | 0.77 | 40.7 |
+| May | 45.2 | 115.4 | 21.4 | 13.5 | 0.78 | 42.6 |
+| Jun | 34.5 | 91.5 | 18.0 | 11.8 | 0.68 | 34.8 |
+| Jul | 24.1 | 56.9 | 15.5 | 10.2 | 0.64 | 24.1 |
+| **Aug** | **21.6** | 50.6 | 14.6 | 10.2 | 0.61 | 21.6 |
+| Sep | 26.4 | 62.2 | 15.4 | 10.1 | 0.62 | 23.0 |
+| Oct | 49.7 | 107.6 | 21.3 | 11.0 | 0.79 | 28.0 |
+| **Nov** | **86.8** | 163.2 | 27.9 | 13.3 | 1.05 | 33.0 |
+| Dec | 71.3 | 136.5 | 29.1 | 13.0 | 0.95 | 31.2 |
+
+**PM2.5 swings fourfold across the year: 86.8 in November versus 21.6 in August.**
+The pattern is the Indian monsoon — winter has cool, stagnant air with weak
+dispersion, while the June–September monsoon scavenges particulates. Every
+combustion pollutant (PM2.5, PM10, NO2, CO) peaks in the same winter months,
+confirming a shared driver rather than a pollutant-specific effect.
+
+**Ozone behaves oppositely**, peaking in May (42.6) when particulate is near its
+annual low. Ozone forms photochemically from NO₂ under sunlight, so it is
+favoured by the bright, windy pre-monsoon months and suppressed when NO₂ is
+high — the same mechanism visible in the correlation matrix.
+
+### B2. Diurnal cycle
+
+| | PM2.5 | CO |
+|---|---|---|
+| **Peak** | 22:00 IST — 59.0 µg/m³ | 19:00 IST — 1.06 µg/m³ |
+| **Minimum** | 16:00 IST — 39.8 µg/m³ | 15:00 IST — 0.64 µg/m³ |
+
+The two pollutants peak at different hours. PM2.5 accumulates through the day and
+peaks late evening, while CO — a direct traffic emission rather than an
+accumulating one — spikes in the **evening rush hour** and drops during
+afternoon traffic troughs. That distinction between an accumulated secondary
+pollutant and an emitted primary pollutant is visible in the hourly data.
+
+Chart: `results/temporal_trends.png`
+
+---
+
+## C. Pollutant analysis
+
+Per-pollutant statistics are in section A1 and `results/pollutant_stats.csv`.
+Distributions are strongly right-skewed for all six pollutants (section A1),
+which is why the charts use log axes — on a linear axis SO2 and CO would be
+flat lines against PM10.
+
+Coverage is incomplete by design and reported rather than filled:
+
+| Pollutant | present | missing | missing % |
+|---|---|---|---|
+| PM2.5 | 3,932,392 | 266,429 | 6.35% |
+| PM10 | 3,864,549 | 334,272 | 7.96% |
+| NO2 | 3,983,789 | 215,032 | 5.12% |
+| SO2 | 3,865,493 | 333,328 | 7.94% |
+| CO | 3,982,313 | 216,508 | 5.16% |
+| Ozone | 3,840,559 | 358,262 | 8.53% |
+
+Chart: `results/pollutant_distribution.png`
+
+---
+
+## D. Correlation analysis
+
+Pearson correlation on complete pairwise observations, all in µg/m³.
+
+| | PM2.5 | PM10 | NO2 | SO2 | CO | Ozone |
+|---|---|---|---|---|---|---|
+| **PM2.5** | 1.000 | **0.839** | 0.331 | 0.096 | 0.382 | 0.017 |
+| **PM10** | 0.839 | 1.000 | 0.385 | 0.121 | 0.411 | 0.065 |
+| **NO2** | 0.331 | 0.385 | 1.000 | 0.102 | 0.358 | −0.025 |
+| **SO2** | 0.096 | 0.121 | 0.102 | 1.000 | 0.134 | 0.011 |
+| **CO** | 0.382 | 0.411 | 0.358 | 0.134 | 1.000 | −0.050 |
+| **Ozone** | 0.017 | 0.065 | −0.025 | 0.011 | −0.050 | 1.000 |
+
+Three findings:
+
+1. **PM2.5–PM10 is the only strong relationship (r = 0.839).** Fine and coarse
+   particulate share combustion sources and are transported together, so they
+   move as one. This is the single most robust result in the analysis.
+
+2. **CO and NO₂ form a traffic-marker cluster.** CO correlates with NO₂ at
+   0.358 and with PM10 at 0.411 — both combustion products, so both are elevated
+   together. SO₂ is the outlier: its highest correlation with any other
+   pollutant is only 0.134. SO₂ in India is increasingly dominated by industry
+   rather than vehicles, and its regional concentration makes it behave
+   independently.
+
+3. **Ozone is essentially uncorrelated with every particulate** (|r| < 0.07),
+   and *negatively* so with NO₂ (−0.025) and CO (−0.050). Ozone forms from NO₂
+   under sunlight, so where traffic is heaviest the nitrogen is consumed to
+   make ozone rather than remaining as NO₂. This is the expected
+   titration relationship, and it is why Ozone must be normalised separately
+   from the combustion pollutants in any interpretation.
+
+Chart: `results/correlation_heatmap.png`
+
+---
+
+## E. K-means clustering
+
+### E1. Choosing k
+
+Both methods over k = 2…10 on standardised features:
+
+| k | inertia | silhouette |
+|---|---|---|
+| **2** | 1990.24 | **0.3830** |
+| 3 | 1637.04 | 0.2246 |
+| 4 | 1419.16 | 0.2365 |
+| 5 | 1262.50 | 0.2345 |
+| 6 | 1149.31 | 0.2182 |
+| 7 | 1058.34 | 0.1917 |
+| 8 | 994.65 | 0.1958 |
+| 9 | 943.65 | 0.1887 |
+| 10 | 901.00 | 0.1872 |
+
+**k = 2 chosen** on the highest silhouette score (0.383). The silhouette at
+k = 2 is roughly 60% better than any other k, so the separation is decisive.
+
+**Reported honestly:** the elbow — the largest single drop in inertia — falls at
+k = 3, not k = 2. Inertia decreases smoothly with no sharp bend at k = 2, so the
+two methods do not fully agree. The silhouette is weighted higher because it
+measures separation directly, whereas inertia must decrease by construction and
+requires a subjective elbow. Both curves are plotted in
+`results/k_selection.png` so the choice can be judged rather than taken on
+trust.
+
+### E2. Standardisation mattered
+
+```
+largest/smallest feature spread ratio: 115.0×
+```
+
+Unscaled, PM10's spread would have dominated the squared Euclidean distance and
+the clustering would have been, in effect, a PM10 clustering. Features are
+z-scored before clustering; results are reported in original µg/m³.
+
+### E3. Cluster profiles
+
+483 stations clustered (of 538: 5 excluded for fewer than 500 hourly readings,
+50 excluded for missing at least one pollutant — mostly US Embassy monitors
+that measure PM2.5 only).
+
+| Cluster | Stations | PM2.5 | PM10 | NO2 | SO2 | CO | Ozone | Cities |
+|---|---|---|---|---|---|---|---|---|
+| **0 — higher** | 107 | **81.4** | 175.7 | 38.0 | 15.3 | 1.25 | 36.7 | 48 |
+| **1 — lower** | 376 | 39.8 | 87.1 | 17.6 | 11.6 | 0.67 | 28.3 | 201 |
+
+Cluster 0 is roughly **twice as polluted as cluster 1 on every combustion
+pollutant**, but its stations span 48 cities — so the split is not a simple
+city-versus-noncity division. It reflects how heavily a station's surroundings
+load its local air: cluster 0 contains the monitors inside dense urban cores,
+cluster 1 both the cleaner stations and monitors on the urban fringe.
+
+Both clusters retain higher Ozone than their PM2.5 ratio would suggest
+(36.7 and 28.3 against PM2.5 of 81.4 and 39.8), consistent with the correlation
+finding that Ozone is governed by a different process.
+
+Charts: `results/station_clusters.png`, `results/k_selection.png`,
+`results/cluster_profiles.csv`
+
+---
+
+## Data quality
+
+| Check | Result |
+|---|---|
+| Raw rows ingested | 46,937,170 |
+| Header rows skipped | 52 (one per part file) |
+| Non-core pollutants excluded | 23,468,051 |
+| Negative values dropped | 24 |
+| Non-numeric values dropped | 0 |
+| **Readings aggregated** | **23,469,095** ✓ reconciles exactly |
+| Stations with null city | 47 (labelled `Unknown`, retained) |
+| Station-hours after reshape | 4,198,821 |
+| `Unknown` city rows | 299,742 |
+
+**Pig and MapReduce independently agree on 23,469,095 readings.** Two separately
+written tools counting identically to the row is the strongest single check in
+the project; it caught two real defects during development.
+
+---
+
+## Limitations
+
+- **The source is preliminary data.** XKDR publishes readings as received from
+  the monitoring networks, which label them preliminary and not fully validated.
+  The compilation carries no warranty and is **not validated for regulatory,
+  legal or health decisions.**
+- **One year.** 2024 only. Longer history exists but pre-2015 station density is
+  too sparse for comparable city means.
+- **Single-node cluster.** Demonstrates the Hadoop APIs and data flow, not
+  multi-node parallelism. There is one DataNode and one NodeManager.
+- **1000 µg/m³ ceiling values are retained**, not clipped. They are instrument
+  reporting limits, so the top of the PM2.5 and PM10 distributions is censored.
+- **No meteorological covariates.** Wind speed, boundary-layer height and
+  rainfall would explain much of the temporal variation, but they are outside
+  this dataset.
+- **K = 2 vs the elbow at 3 is a genuine ambiguity**, documented rather than
+  hidden.
+- **City labels are as published by CPCB**, not geocoded; city boundaries differ
+  between sources, so comparisons with other studies may shift slightly.
