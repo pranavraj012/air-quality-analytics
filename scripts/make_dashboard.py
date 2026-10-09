@@ -6,8 +6,8 @@ from the pipeline's own output files so they cannot drift.
 
 Inputs (all in results/):
   descriptive_stats.csv, correlation.csv, monthly.csv,
-  hourly_profile.csv, k_selection.csv, cluster_profiles.csv,
-  city_pm25.csv, thresholds.csv, exceedance_network.csv,
+  hourly_profile.csv, city_pm25.csv, thresholds.csv,
+  exceedance_network.csv, exceedance_by_city.csv,
   exceedance_worst.csv
 """
 import pandas as pd
@@ -20,16 +20,18 @@ desc = pd.read_csv(R / "descriptive_stats.csv")
 corr = pd.read_csv(R / "correlation.csv").sort_values("correlation", ascending=False)
 monthly = pd.read_csv(R / "monthly.csv")
 hourly = pd.read_csv(R / "hourly_profile.csv")
-ksel = pd.read_csv(R / "k_selection.csv")
-clusters = pd.read_csv(R / "cluster_profiles.csv")
 cities = pd.read_csv(R / "city_pm25.csv")
 cities = cities[cities.stations >= 3].nlargest(10, "pm25_avg")
 thresholds = pd.read_csv(R / "thresholds.csv")
 net = pd.read_csv(R / "exceedance_network.csv")
 worst = pd.read_csv(R / "exceedance_worst.csv")
+bycity = pd.read_csv(R / "exceedance_by_city.csv")
 
 f2 = lambda x: f"{x:,.2f}"
 f0 = lambda x: f"{x:,.0f}"
+
+PCTS = ["PM2.5", "PM10", "NO2", "SO2", "CO", "Ozone"]
+STD = {"PM2.5": 60, "PM10": 100, "NO2": 80, "SO2": 50, "CO": 2000, "Ozone": 100}
 
 # ---------- CSS bar strips (no JS) ----------
 def bars(df, col, label, unit):
@@ -90,21 +92,6 @@ monthly_tbl = table(
     highlight=lambda r: r["month"] in (8, 11),
 )
 
-ksel_tbl = table(
-    ksel,
-    ["k", "inertia", "silhouette"],
-    ["k", "inertia", "silhouette"],
-    formats={"inertia": f2, "silhouette": lambda x: f"{x:.4f}"},
-    highlight=lambda r: r["k"] == 2,
-)
-
-cluster_tbl = table(
-    clusters,
-    ["Cluster", "Stations", "PM2.5", "PM10", "NO2", "SO2", "CO", "Ozone"],
-    ["cluster", "stations", "PM2.5", "PM10", "NO2", "SO2", "CO", "Ozone"],
-    formats={"stations": f0, "PM2.5": f2, "PM10": f2, "NO2": f2, "SO2": f2, "CO": f2, "Ozone": f2},
-)
-
 city_tbl = table(
     cities,
     ["City", "Stations", "Mean PM2.5 (µg/m³)", "min", "max"],
@@ -118,8 +105,6 @@ threshold_tbl = table(
     ["pollutant", "naaqs_ug_m3", "naaqs_averaging_time", "who_2021_ug_m3", "who_averaging_time"],
     formats={"naaqs_ug_m3": f0, "who_2021_ug_m3": f0},
 )
-
-PCTS = ["PM2.5", "PM10", "NO2", "SO2", "CO", "Ozone"]
 
 def cell(row, p):
     m, pc = row[f"{p}_mean"], row[f"{p}_pct"]
@@ -155,6 +140,35 @@ net_tbl = table(
              "cities_with_mean_above": f0, "worst_city_pct_above": lambda x: f"{x:.1f}%"},
 )
 
+# ---------- highlights: city x pollutant exceedances, ranked ----------
+long_rows = []
+for p in PCTS:
+    sub = bycity[["city_name", "state_name", f"{p}_mean", f"{p}_pct"]].dropna(
+        subset=[f"{p}_pct"])
+    for _, r in sub.iterrows():
+        long_rows.append({
+            "city_name": r.city_name, "state_name": r.state_name,
+            "pollutant": p, "standard": STD[p],
+            "mean": r[f"{p}_mean"], "pct": r[f"{p}_pct"],
+        })
+long_df = pd.DataFrame(long_rows)
+long_df = long_df[long_df.pct > 0].sort_values("pct", ascending=False)
+n_exceed = len(long_df)
+
+hl_rows = []
+for i, (_, r) in enumerate(long_df.head(20).iterrows(), 1):
+    hl_rows.append(
+        f"<tr><td>{i}</td><td>{r.city_name}</td><td>{r.state_name}</td>"
+        f"<td>{r.pollutant}</td><td>{f0(r.standard)}</td>"
+        f"<td>{f2(r['mean'])}</td><td>{r.pct:.1f}%</td></tr>"
+    )
+highlights_tbl = (
+    "<table><thead><tr><th>#</th><th>City</th><th>State</th><th>Pollutant</th>"
+    "<th>NAAQS (µg/m³)</th><th>City mean (µg/m³)</th>"
+    "<th>% of days above</th></tr></thead><tbody>"
+    + "".join(hl_rows) + "</tbody></table>"
+)
+
 # diurnal peaks
 def peak(col):
     mx = hourly.loc[hourly[col].idxmax()]
@@ -169,6 +183,7 @@ no2_pk, no2_mn = peak("no2_avg")
 pm10_row = net[net.pollutant == "PM10"].iloc[0]
 pm25_row = net[net.pollutant == "PM2.5"].iloc[0]
 co_row = net[net.pollutant == "CO"].iloc[0]
+worst_overall = long_df.iloc[0]
 
 html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -239,9 +254,9 @@ html = f"""<!DOCTYPE html>
   <div class="card"><div class="v">538</div><div class="k">monitoring stations · 29 states · 245 cities</div></div>
   <div class="card"><div class="v">4,198,821</div><div class="k">station-hours reshaped for analytics</div></div>
   <div class="card"><div class="v bad">42%</div><div class="k">of station-days above the PM10 standard (100 µg/m³)</div></div>
+  <div class="card"><div class="v bad">{worst_overall.pct:.1f}%</div><div class="k">worst single exceedance: {worst_overall.city_name} {worst_overall.pollutant}</div></div>
   <div class="card"><div class="v">105.1</div><div class="k">Delhi mean PM2.5 (µg/m³) — highest of any city with ≥ 3 stations</div></div>
   <div class="card"><div class="v">0.839</div><div class="k">strongest correlation: PM2.5–PM10</div></div>
-  <div class="card"><div class="v">2</div><div class="k">station clusters (silhouette 0.383)</div></div>
   <div class="card"><div class="v">31/31</div><div class="k">automated checks passing</div></div>
 </div>
 
@@ -279,7 +294,7 @@ for CO and Ozone. The analysis below therefore compares <b>daily 24-hour means</
 PM/NO2/SO2 standards and <b>8-hour block means</b> (00–07, 08–15, 16–23) to the CO and
 Ozone standards — each pollutant against its own averaging time, as the standards specify.</p>
 
-<h2><span class="n">3 ·</span> What exceeded — city by city</h2>
+<h2><span class="n">3 ·</span> Highlights — which city exceeded which threshold</h2>
 <div class="cards">
   <div class="card"><div class="v bad">{pm10_row.pct_above:.0f}%</div><div class="k">of {f0(pm10_row.observations)} station-days above the PM10 standard</div></div>
   <div class="card"><div class="v bad">{f0(pm10_row.cities_with_mean_above)} / 245</div><div class="k">cities whose PM10 mean exceeds the standard</div></div>
@@ -288,6 +303,13 @@ Ozone standards — each pollutant against its own averaging time, as the standa
   <div class="card"><div class="v">{co_row.pct_above:.1f}%</div><div class="k">of 8-hour blocks above the CO standard (2 mg/m³) — worst: Vapi {co_row.worst_city_pct_above:.0f}%</div></div>
   <div class="card"><div class="v">≤ 2.6%</div><div class="k">of days above standard for NO2, SO2, Ozone — within limits network-wide</div></div>
 </div>
+
+<h3>The worst exceedances, ranked (top 20 of {n_exceed:,} city–pollutant exceedances)</h3>
+{highlights_tbl}
+<p class="note">Sorted by % of days above the standard. A city must have at least 30
+station-days (or 8-hour blocks) for a pollutant to be ranked, so a city with two days
+of data cannot top the list. The full table for all 245 cities is
+<code>results/exceedance_by_city.csv</code>.</p>
 
 <h3>Network-wide exceedances</h3>
 {net_tbl}
@@ -303,8 +325,7 @@ data for that pollutant. Cities are ranked by their worst pollutant. The Nationa
 Region belt (Greater Noida, Gurugram, Ghaziabad, Delhi, Noida, Faridabad, Ballabgarh)
 dominates the list, joined by Rajasthan's Sri Ganganagar, Hanumangarh, Bikaner and
 Bhiwadi. Byrnihat (Assam) has the worst PM2.5 rate but a single station, so it is
-excluded from city rankings that require ≥ 3 stations. Full table for all 245 cities:
-<code>results/exceedance_by_city.csv</code>.</p>
+excluded from city rankings that require ≥ 3 stations.</p>
 
 <h2><span class="n">4 ·</span> Pollutant statistics (µg/m³)</h2>
 {pollutant_tbl}
@@ -372,48 +393,13 @@ the CO unit conversion.</p>
 air shed. The ≥ 3 station filter matters: without it a single-station town (Byrnihat, 128.7 µg/m³
 from one monitor) would outrank Delhi.</p>
 
-<h2><span class="n">8 ·</span> K-means clustering of stations</h2>
-<div class="grid2">
-  <div>
-    <h3 style="margin:0 0 8px">Choosing k — the two methods disagree (shown, not hidden)</h3>
-    {ksel_tbl}
-    <p class="note">k = 2 chosen on silhouette (0.383); the elbow falls at k = 3 (0.225).
-    Silhouette is weighted higher because it measures separation directly, whereas inertia must
-    fall by construction.</p>
-  </div>
-  <div>
-    <h3 style="margin:0 0 8px">Cluster profiles (µg/m³)</h3>
-    {cluster_tbl}
-    <p class="note">Cluster 0 (107 stations) is roughly twice as polluted as cluster 1 (376 stations)
-    on every combustion pollutant, yet spans 48 cities — the split is not a simple "Delhi vs rest".
-    A silhouette of 0.383 means real but not sharp structure: air quality grades continuously
-    between stations.</p>
-  </div>
-</div>
-<div class="grid2" style="margin-top:16px">
-  <div class="imgbox"><img src="results/station_clusters.png" alt="Station clusters"></div>
-  <div class="imgbox"><img src="results/k_selection.png" alt="K selection curves"></div>
-</div>
-<div class="explain">
-  <p><b>Why K-means was performed.</b> The first four components describe pollution — how much,
-  where, when, and how pollutants relate. K-means answers a different question: <b>do monitoring
-  stations fall into distinct pollution profiles, and which pollutants define them?</b></p>
-  <p>Each station becomes a feature vector — its annual mean of all six pollutants — z-scored so
-  no single pollutant dominates (the six features differ in spread by 115×; unscaled, K-means
-  would effectively cluster on PM10 alone). 483 of 538 stations have complete vectors; the 55
-  with gaps were dropped, not imputed.</p>
-  <p>The result is a two-group split: 107 stations averaging roughly twice the combustion
-  pollutants of the other 376. That identifies the heavily-affected stations <b>as a group</b> —
-  the subset where mitigation matters most — without assuming in advance which cities belong there.</p>
-</div>
-
-<h2><span class="n">9 ·</span> Remaining charts</h2>
+<h2><span class="n">8 ·</span> Remaining charts</h2>
 <div class="gallery">
   <div class="imgbox"><img src="results/temporal_trends.png" alt="Temporal trends"></div>
   <div class="imgbox"><img src="results/pollutant_distribution.png" alt="Pollutant distributions"></div>
 </div>
 
-<h2><span class="n">10 ·</span> How these numbers were produced</h2>
+<h2><span class="n">9 ·</span> How these numbers were produced</h2>
 <div class="recon">XKDR API → monthly Parquet (long format)
   │
   ├─ scripts/download_data.py      fetch + metadata
@@ -429,15 +415,15 @@ HDFS /airquality/raw
         ├─► MAPREDUCE   1,454 city × pollutant pairs   (agrees with Pig exactly)
         ├─► HIVE        SQL: GROUP BY / HAVING / CORR / VAR_POP
         └─► PYTHON      pivot → 4,198,821 station-hours
-                         statistics · correlation · K-means · charts
+                         statistics · correlation · charts
                          NAAQS exceedance (daily & 8-hour block means)
 Stack: OpenJDK 8 · Hadoop 3.3.6 · Pig 0.17.0 · Hive 3.1.3 · Python 3.12
 (pandas, numpy, pyarrow, scikit-learn, matplotlib, seaborn)</div>
 <p class="note">Correctness: two independently written programs (Pig and MapReduce) process the same
 rows with the same filters and agree exactly at 23,469,095; every raw row is reconciled above;
 31 automated checks pass (<code>./tests/test_pipeline.sh</code>). This dashboard is a static file —
-no server, no database, no JavaScript. Regenerate charts with <code>visualization/*.py</code> and
-this page with <code>scripts/make_dashboard.py</code>.</p>
+no server, no database, no JavaScript. Regenerate it with <code>scripts/exceedance.py</code> then
+<code>scripts/make_dashboard.py</code>; charts with <code>visualization/*.py</code>.</p>
 
 </main>
 <footer>
@@ -452,3 +438,4 @@ this page with <code>scripts/make_dashboard.py</code>.</p>
 
 (ROOT / "dashboard.html").write_text(html, encoding="utf-8")
 print(f"wrote dashboard.html ({len(html):,} bytes)")
+print(f"highlights: top 20 of {n_exceed:,} city–pollutant exceedances")

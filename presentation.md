@@ -5,11 +5,12 @@ pipeline and verified against `results/` — nothing is recalled or
 estimated. Each slide gives you three things:
 
 - **On the slide** — the exact content to paste (bullets, tables, diagrams)
-- **Visual** — which chart to insert (all six are in `results/`)
+- **Visual** — which chart to insert (the four used in the deck are in `results/`)
 - **Say** — speaker notes
 
-There is no dashboard, so the results live in the slides as tables plus
-the six generated charts.
+The companion dashboard is `dashboard.html` (static, opens in any
+browser). In the talk, the results live in the slides as tables plus
+the four generated charts.
 
 ---
 
@@ -21,7 +22,7 @@ the six generated charts.
 Air Quality Analytics in India
 Using the Hadoop Ecosystem
 
-Distributed storage, ETL, aggregation and clustering of
+Distributed storage, ETL and aggregation of
 46,937,170 hourly pollutant readings from India's CPCB
 monitoring network
 
@@ -30,7 +31,8 @@ monitoring network
 
 **Say:** "I analysed a full year of hourly air-quality readings from
 India's official monitoring network using Hadoop, Pig, Hive and
-MapReduce, then clustered the stations with K-means."
+MapReduce — then measured which cities exceed the national
+air-quality standards, and by how much."
 
 ---
 
@@ -104,7 +106,7 @@ MapReduce   Mapper labels 46.9M rows in parallel → shuffle
 Pig         ETL as a readable data-flow language, compiled to
             MapReduce jobs
 Hive        SQL over HDFS: GROUP BY, HAVING, CORR, VAR_POP
-Python      long→wide reshape, statistics, K-means, charts
+Python      long→wide reshape, statistics, NAAQS exceedance, charts
 ```
 
 **Say:** "Each tool does the job it is actually best at, and Pig and
@@ -164,7 +166,8 @@ HDFS  /airquality/raw                 3.63 GB · 52 files
    │          ├─► MAPREDUCE    1,454 city × pollutant pairs
    │          ├─► HIVE         SQL: GROUP BY / HAVING / CORR
    │          └─► PYTHON       pivot → wide: 4,198,821 station-hours
-   │                            statistics · correlation · K-means · charts
+   │                            statistics · correlation · charts
+   │                            NAAQS exceedance (daily & 8-hour means)
    ▼
 results/*.csv      results/*.png
 ```
@@ -327,46 +330,7 @@ scale-invariant, and two independent implementations reproduce it."
 
 ---
 
-## SLIDE 12 — Result 5: K-means clustering
-
-**On the slide:**
-
-```
-Features: each station's mean of the six pollutants, z-scored
-(the six features differ in spread by 115× — unscaled, K-means
-would reduce to clustering on PM10 alone)
-
-Choosing k — the two methods disagree (reported honestly):
-
- k     inertia    silhouette
- 2    1990.24      0.383   ← chosen (silhouette)
- 3    1637.04      0.225   ← elbow
- …      …            …      (up to k=10, all plotted)
-
-The two clusters:
-
-            Stations   PM2.5   PM10     CO
-0 — higher    107      81.4   175.7   1250.7
-1 — lower     376      39.8    87.1    672.5
-```
-
-**Say:** "I chose k = 2 on the silhouette, 0.383, while the elbow
-suggests 3 — I'm showing both curves rather than hiding the
-disagreement. Silhouette is weighted higher because it measures
-separation directly, whereas inertia must fall by construction. 0.383
-means real but not sharp structure — expected, because air quality
-grades continuously between stations. 483 of 538 stations have
-complete feature vectors; the 55 with gaps were dropped, not imputed."
-
-**Visual — two charts, placed side by side (not stacked):**
-
-| Left | Right |
-|---|---|
-| `results/station_clusters.png` | `results/k_selection.png` |
-
----
-
-## SLIDE 13 — Correctness and validation
+## SLIDE 12 — Correctness and validation
 
 **On the slide:**
 
@@ -405,7 +369,7 @@ Checking counts is not checking values.
 
 ---
 
-## SLIDE 14 — Limitations
+## SLIDE 13 — Limitations
 
 **On the slide:**
 
@@ -420,12 +384,11 @@ Checking counts is not checking values.
   for comparable city-level means
 · No meteorological covariates (wind, boundary layer, rainfall),
   which would explain much of the temporal variation
-· k = 2 vs an elbow at 3 is a genuine ambiguity — both curves shown
 ```
 
 ---
 
-## SLIDE 15 — Conclusion
+## SLIDE 14 — Conclusion
 
 **On the slide:**
 
@@ -433,12 +396,13 @@ Checking counts is not checking values.
 A complete, reproducible Hadoop pipeline over 46,937,170 real
 readings from India's CPCB network
 
-Five analytical components, each answered with measured numbers:
+The analytical components, each answered with measured numbers:
   · Location   Delhi worst at 105.1 µg/m³ PM2.5
   · Temporal   fourfold winter-to-monsoon swing
   · Pollutant  every pollutant right-skewed; PM2.5/PM10 censored
   · Correlation  PM2.5–PM10 r = 0.839; Ozone uncorrelated
-  · Clustering  two station groups, ~2× apart on combustion pollutants
+  · Thresholds  PM10 above the NAAQS on 42% of station-days;
+                121 of 245 cities above the standard
 
 Correctness by construction: two independent implementations agree,
 every raw row reconciled, 31 automated checks green
@@ -449,7 +413,7 @@ real work was, and every rule traces to a measurement
 
 ---
 
-## SLIDE 16 — Backup slides (Q&A material)
+## SLIDE 15 — Backup slides (Q&A material)
 
 **MapReduce output for Delhi (raw CSV — note CO is still mg/m³ here):**
 
@@ -486,11 +450,6 @@ invent measurements."
 "One output file ordered by city — far easier to read and chart. The
 distributed work is the 47M-row map stage and the shuffle."
 
-**Why is the silhouette only 0.383?**
-"Environmental data grades continuously — a station isn't cleanly
-'Delhi' or 'clean', it sits between. Above 0.5 would suggest groups I
-suspect don't exist in this data."
-
 **How long does it take?**
 "Pig ETL ~16 minutes, but that's fixed per-job YARN startup (30–60s ×
 chained jobs), not data volume — a 1M-row subset is barely faster.
@@ -507,11 +466,12 @@ MapReduce ~1 minute; Hive queries ~30 seconds each; full pipeline
 | `results/temporal_trends.png` | 9, Temporal | full width |
 | `results/pollutant_distribution.png` | 10, Distributions | full width |
 | `results/correlation_heatmap.png` | 11, Correlation | full width |
-| `results/station_clusters.png` | 12, K-means | side by side, left |
-| `results/k_selection.png` | 12, K-means | side by side, right |
 
-All six are generated by `visualization/*.py` from the pipeline's own
-output — nothing was drawn by hand.
+The four are generated by `visualization/*.py` from the pipeline's own
+output — nothing was drawn by hand. (`results/station_clusters.png` and
+`results/k_selection.png` also exist in the repo for the K-means
+analysis, which is documented in `docs/results.md` §E if it comes up
+in Q&A.)
 
 ---
 

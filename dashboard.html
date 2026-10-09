@@ -67,9 +67,9 @@
   <div class="card"><div class="v">538</div><div class="k">monitoring stations · 29 states · 245 cities</div></div>
   <div class="card"><div class="v">4,198,821</div><div class="k">station-hours reshaped for analytics</div></div>
   <div class="card"><div class="v bad">42%</div><div class="k">of station-days above the PM10 standard (100 µg/m³)</div></div>
+  <div class="card"><div class="v bad">92.8%</div><div class="k">worst single exceedance: Sri Ganganagar PM10</div></div>
   <div class="card"><div class="v">105.1</div><div class="k">Delhi mean PM2.5 (µg/m³) — highest of any city with ≥ 3 stations</div></div>
   <div class="card"><div class="v">0.839</div><div class="k">strongest correlation: PM2.5–PM10</div></div>
-  <div class="card"><div class="v">2</div><div class="k">station clusters (silhouette 0.383)</div></div>
   <div class="card"><div class="v">31/31</div><div class="k">automated checks passing</div></div>
 </div>
 
@@ -107,7 +107,7 @@ for CO and Ozone. The analysis below therefore compares <b>daily 24-hour means</
 PM/NO2/SO2 standards and <b>8-hour block means</b> (00–07, 08–15, 16–23) to the CO and
 Ozone standards — each pollutant against its own averaging time, as the standards specify.</p>
 
-<h2><span class="n">3 ·</span> What exceeded — city by city</h2>
+<h2><span class="n">3 ·</span> Highlights — which city exceeded which threshold</h2>
 <div class="cards">
   <div class="card"><div class="v bad">42%</div><div class="k">of 174,707 station-days above the PM10 standard</div></div>
   <div class="card"><div class="v bad">121 / 245</div><div class="k">cities whose PM10 mean exceeds the standard</div></div>
@@ -116,6 +116,13 @@ Ozone standards — each pollutant against its own averaging time, as the standa
   <div class="card"><div class="v">4.8%</div><div class="k">of 8-hour blocks above the CO standard (2 mg/m³) — worst: Vapi 71%</div></div>
   <div class="card"><div class="v">≤ 2.6%</div><div class="k">of days above standard for NO2, SO2, Ozone — within limits network-wide</div></div>
 </div>
+
+<h3>The worst exceedances, ranked (top 20 of 1,023 city–pollutant exceedances)</h3>
+<table><thead><tr><th>#</th><th>City</th><th>State</th><th>Pollutant</th><th>NAAQS (µg/m³)</th><th>City mean (µg/m³)</th><th>% of days above</th></tr></thead><tbody><tr><td>1</td><td>Sri Ganganagar</td><td>Rajasthan</td><td>PM10</td><td>100</td><td>235.55</td><td>92.8%</td></tr><tr><td>2</td><td>Greater Noida</td><td>Uttar Pradesh</td><td>PM10</td><td>100</td><td>225.36</td><td>89.2%</td></tr><tr><td>3</td><td>Hanumangarh</td><td>Rajasthan</td><td>PM10</td><td>100</td><td>175.97</td><td>82.6%</td></tr><tr><td>4</td><td>Gurugram</td><td>Haryana</td><td>PM10</td><td>100</td><td>191.82</td><td>82.4%</td></tr><tr><td>5</td><td>Byrnihat</td><td>Assam</td><td>PM10</td><td>100</td><td>211.35</td><td>81.5%</td></tr><tr><td>6</td><td>Ghaziabad</td><td>Uttar Pradesh</td><td>PM10</td><td>100</td><td>181.35</td><td>81.1%</td></tr><tr><td>7</td><td>Bikaner</td><td>Rajasthan</td><td>PM10</td><td>100</td><td>169.89</td><td>80.3%</td></tr><tr><td>8</td><td>Byrnihat</td><td>Assam</td><td>PM2.5</td><td>60</td><td>126.52</td><td>80.2%</td></tr><tr><td>9</td><td>Delhi</td><td>Delhi</td><td>PM10</td><td>100</td><td>212.31</td><td>79.7%</td></tr><tr><td>10</td><td>Bhiwadi</td><td>Rajasthan</td><td>PM10</td><td>100</td><td>166.09</td><td>78.4%</td></tr><tr><td>11</td><td>Ballabgarh</td><td>Haryana</td><td>PM10</td><td>100</td><td>167.97</td><td>78.0%</td></tr><tr><td>12</td><td>Noida</td><td>Uttar Pradesh</td><td>PM10</td><td>100</td><td>184.62</td><td>77.3%</td></tr><tr><td>13</td><td>Faridabad</td><td>Haryana</td><td>PM10</td><td>100</td><td>173.00</td><td>76.6%</td></tr><tr><td>14</td><td>Muzaffarnagar</td><td>Uttar Pradesh</td><td>PM10</td><td>100</td><td>169.15</td><td>76.6%</td></tr><tr><td>15</td><td>Baddi</td><td>Himachal Pradesh</td><td>PM10</td><td>100</td><td>147.72</td><td>75.8%</td></tr><tr><td>16</td><td>Bileipada</td><td>Odisha</td><td>PM10</td><td>100</td><td>163.99</td><td>75.4%</td></tr><tr><td>17</td><td>Mandi Gobindgarh</td><td>Punjab</td><td>PM10</td><td>100</td><td>145.84</td><td>75.1%</td></tr><tr><td>18</td><td>Durgapur</td><td>West Bengal</td><td>PM10</td><td>100</td><td>157.61</td><td>74.9%</td></tr><tr><td>19</td><td>Chittorgarh</td><td>Rajasthan</td><td>PM10</td><td>100</td><td>130.84</td><td>74.0%</td></tr><tr><td>20</td><td>Pali</td><td>Rajasthan</td><td>PM10</td><td>100</td><td>135.96</td><td>73.9%</td></tr></tbody></table>
+<p class="note">Sorted by % of days above the standard. A city must have at least 30
+station-days (or 8-hour blocks) for a pollutant to be ranked, so a city with two days
+of data cannot top the list. The full table for all 245 cities is
+<code>results/exceedance_by_city.csv</code>.</p>
 
 <h3>Network-wide exceedances</h3>
 <table><thead><tr><th>Pollutant</th><th>Standard</th><th>Averaging</th><th>Observations</th><th>Above</th><th>% above</th><th>Cities above</th><th>Worst city</th><th>Worst city %</th></tr></thead><tbody><tr><td>PM2.5</td><td>60</td><td>24-hour</td><td>177,824</td><td>48,220</td><td>27.1%</td><td>48</td><td>Byrnihat</td><td>80.2%</td></tr><tr><td>PM10</td><td>100</td><td>24-hour</td><td>174,707</td><td>74,081</td><td>42.4%</td><td>121</td><td>Sri Ganganagar</td><td>92.8%</td></tr><tr><td>NO2</td><td>80</td><td>24-hour</td><td>176,758</td><td>3,521</td><td>2.0%</td><td>1</td><td>Dhanbad</td><td>34.1%</td></tr><tr><td>SO2</td><td>50</td><td>24-hour</td><td>172,448</td><td>2,947</td><td>1.7%</td><td>0</td><td>Mandideep</td><td>37.3%</td></tr><tr><td>CO</td><td>2,000</td><td>8-hour</td><td>514,606</td><td>24,610</td><td>4.8%</td><td>3</td><td>Vapi</td><td>71.0%</td></tr><tr><td>Ozone</td><td>100</td><td>8-hour</td><td>499,701</td><td>13,049</td><td>2.6%</td><td>0</td><td>Baddi</td><td>24.4%</td></tr></tbody></table>
@@ -131,8 +138,7 @@ data for that pollutant. Cities are ranked by their worst pollutant. The Nationa
 Region belt (Greater Noida, Gurugram, Ghaziabad, Delhi, Noida, Faridabad, Ballabgarh)
 dominates the list, joined by Rajasthan's Sri Ganganagar, Hanumangarh, Bikaner and
 Bhiwadi. Byrnihat (Assam) has the worst PM2.5 rate but a single station, so it is
-excluded from city rankings that require ≥ 3 stations. Full table for all 245 cities:
-<code>results/exceedance_by_city.csv</code>.</p>
+excluded from city rankings that require ≥ 3 stations.</p>
 
 <h2><span class="n">4 ·</span> Pollutant statistics (µg/m³)</h2>
 <table><thead><tr><th>Pollutant</th><th>n</th><th>missing</th><th>mean</th><th>median</th><th>min</th><th>max</th><th>stddev</th></tr></thead><tbody><tr><td>PM2.5</td><td>3,932,392</td><td>266,429</td><td>50.38</td><td>35.42</td><td>0.00</td><td>1,000.00</td><td>53.50</td></tr><tr><td>PM10</td><td>3,864,549</td><td>334,272</td><td>108.17</td><td>82.25</td><td>0.01</td><td>1,000.00</td><td>93.28</td></tr><tr><td>NO2</td><td>3,983,789</td><td>215,032</td><td>22.20</td><td>15.37</td><td>0.01</td><td>497.77</td><td>23.99</td></tr><tr><td>SO2</td><td>3,865,493</td><td>333,328</td><td>12.34</td><td>8.60</td><td>0.01</td><td>199.90</td><td>13.74</td></tr><tr><td>CO</td><td>3,982,313</td><td>216,508</td><td>806.18</td><td>630.00</td><td>0.00</td><td>48,280.00</td><td>729.77</td></tr><tr><td>Ozone</td><td>3,840,559</td><td>358,262</td><td>31.27</td><td>22.48</td><td>0.01</td><td>490.60</td><td>29.22</td></tr></tbody></table>
@@ -200,48 +206,13 @@ the CO unit conversion.</p>
 air shed. The ≥ 3 station filter matters: without it a single-station town (Byrnihat, 128.7 µg/m³
 from one monitor) would outrank Delhi.</p>
 
-<h2><span class="n">8 ·</span> K-means clustering of stations</h2>
-<div class="grid2">
-  <div>
-    <h3 style="margin:0 0 8px">Choosing k — the two methods disagree (shown, not hidden)</h3>
-    <table><thead><tr><th>k</th><th>inertia</th><th>silhouette</th></tr></thead><tbody><tr class="hl"><td>2.0</td><td>1,990.24</td><td>0.3830</td></tr><tr><td>3.0</td><td>1,637.04</td><td>0.2246</td></tr><tr><td>4.0</td><td>1,419.16</td><td>0.2365</td></tr><tr><td>5.0</td><td>1,262.50</td><td>0.2345</td></tr><tr><td>6.0</td><td>1,149.31</td><td>0.2182</td></tr><tr><td>7.0</td><td>1,058.34</td><td>0.1917</td></tr><tr><td>8.0</td><td>994.65</td><td>0.1958</td></tr><tr><td>9.0</td><td>943.65</td><td>0.1887</td></tr><tr><td>10.0</td><td>901.00</td><td>0.1872</td></tr></tbody></table>
-    <p class="note">k = 2 chosen on silhouette (0.383); the elbow falls at k = 3 (0.225).
-    Silhouette is weighted higher because it measures separation directly, whereas inertia must
-    fall by construction.</p>
-  </div>
-  <div>
-    <h3 style="margin:0 0 8px">Cluster profiles (µg/m³)</h3>
-    <table><thead><tr><th>Cluster</th><th>Stations</th><th>PM2.5</th><th>PM10</th><th>NO2</th><th>SO2</th><th>CO</th><th>Ozone</th></tr></thead><tbody><tr><td>0.0</td><td>107</td><td>81.45</td><td>175.70</td><td>37.97</td><td>15.32</td><td>1,250.71</td><td>36.70</td></tr><tr><td>1.0</td><td>376</td><td>39.84</td><td>87.06</td><td>17.56</td><td>11.60</td><td>672.50</td><td>28.34</td></tr></tbody></table>
-    <p class="note">Cluster 0 (107 stations) is roughly twice as polluted as cluster 1 (376 stations)
-    on every combustion pollutant, yet spans 48 cities — the split is not a simple "Delhi vs rest".
-    A silhouette of 0.383 means real but not sharp structure: air quality grades continuously
-    between stations.</p>
-  </div>
-</div>
-<div class="grid2" style="margin-top:16px">
-  <div class="imgbox"><img src="results/station_clusters.png" alt="Station clusters"></div>
-  <div class="imgbox"><img src="results/k_selection.png" alt="K selection curves"></div>
-</div>
-<div class="explain">
-  <p><b>Why K-means was performed.</b> The first four components describe pollution — how much,
-  where, when, and how pollutants relate. K-means answers a different question: <b>do monitoring
-  stations fall into distinct pollution profiles, and which pollutants define them?</b></p>
-  <p>Each station becomes a feature vector — its annual mean of all six pollutants — z-scored so
-  no single pollutant dominates (the six features differ in spread by 115×; unscaled, K-means
-  would effectively cluster on PM10 alone). 483 of 538 stations have complete vectors; the 55
-  with gaps were dropped, not imputed.</p>
-  <p>The result is a two-group split: 107 stations averaging roughly twice the combustion
-  pollutants of the other 376. That identifies the heavily-affected stations <b>as a group</b> —
-  the subset where mitigation matters most — without assuming in advance which cities belong there.</p>
-</div>
-
-<h2><span class="n">9 ·</span> Remaining charts</h2>
+<h2><span class="n">8 ·</span> Remaining charts</h2>
 <div class="gallery">
   <div class="imgbox"><img src="results/temporal_trends.png" alt="Temporal trends"></div>
   <div class="imgbox"><img src="results/pollutant_distribution.png" alt="Pollutant distributions"></div>
 </div>
 
-<h2><span class="n">10 ·</span> How these numbers were produced</h2>
+<h2><span class="n">9 ·</span> How these numbers were produced</h2>
 <div class="recon">XKDR API → monthly Parquet (long format)
   │
   ├─ scripts/download_data.py      fetch + metadata
@@ -257,15 +228,15 @@ HDFS /airquality/raw
         ├─► MAPREDUCE   1,454 city × pollutant pairs   (agrees with Pig exactly)
         ├─► HIVE        SQL: GROUP BY / HAVING / CORR / VAR_POP
         └─► PYTHON      pivot → 4,198,821 station-hours
-                         statistics · correlation · K-means · charts
+                         statistics · correlation · charts
                          NAAQS exceedance (daily & 8-hour block means)
 Stack: OpenJDK 8 · Hadoop 3.3.6 · Pig 0.17.0 · Hive 3.1.3 · Python 3.12
 (pandas, numpy, pyarrow, scikit-learn, matplotlib, seaborn)</div>
 <p class="note">Correctness: two independently written programs (Pig and MapReduce) process the same
 rows with the same filters and agree exactly at 23,469,095; every raw row is reconciled above;
 31 automated checks pass (<code>./tests/test_pipeline.sh</code>). This dashboard is a static file —
-no server, no database, no JavaScript. Regenerate charts with <code>visualization/*.py</code> and
-this page with <code>scripts/make_dashboard.py</code>.</p>
+no server, no database, no JavaScript. Regenerate it with <code>scripts/exceedance.py</code> then
+<code>scripts/make_dashboard.py</code>; charts with <code>visualization/*.py</code>.</p>
 
 </main>
 <footer>
