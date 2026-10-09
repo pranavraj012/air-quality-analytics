@@ -265,6 +265,7 @@ air-quality-bda/
     ├── architecture.md        data flow and each component's role
     ├── methodology.md         every cleaning rule, with its evidence
     ├── results.md             all findings with numbers
+    ├── presentation.md        slide-by-slide content for the talk, with all results tables
     ├── subset_validation.md   what the subset proves, and what it cannot
     ├── demo.md                5-minute demo script + viva Q&A
     └── citations.md           dataset, licences, software versions
