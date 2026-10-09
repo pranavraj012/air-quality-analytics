@@ -315,13 +315,12 @@ Clusters: **107 stations** at mean PM2.5 81.4, **376 stations** at 39.8.
 > input row is accounted for:"
 
 ```
-raw rows                 46,937,170
-header rows skipped             52   (one per part file)
-non-core pollutants    23,468,051
-negatives dropped             24
-non-numeric values             0
-                        ─────────
-aggregated             23,469,095   ✓ reconciles exactly
+Parquet data rows             46,937,170
+  non-core pollutants       − 23,468,051
+  negative values           −       24
+                          ─────────────
+Pig = MapReduce output        23,469,095   ✓ exact match
+(+ 52 header lines skipped — one per CSV file, not data rows)
 ```
 
 > "Nothing vanished."
