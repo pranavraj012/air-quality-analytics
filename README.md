@@ -99,6 +99,12 @@ numbers in [`docs/results.md`](docs/results.md).
 | `results/station_clusters.png` | K-means clusters and their centroids |
 | `results/k_selection.png` | Elbow and silhouette curves for choosing k |
 
+**`dashboard.html`** — every result above in one static page: headline
+numbers, all tables, the reconciliation, and all six charts, with CSS bar
+strips for the monthly and hourly cycles. Open it in any browser; no server,
+no JavaScript, no build step. Generated straight from `results/*.csv`, so the
+numbers cannot drift from the pipeline output.
+
 ---
 
 ## Architecture
@@ -261,6 +267,7 @@ air-quality-bda/
 ├── tests/test_pipeline.sh     31 end-to-end checks
 ├── results/                   CSV tables + PNG charts
 ├── presentation.md            slide-by-slide talk content — every slide, every number
+├── dashboard.html             static dashboard of every result (open in any browser)
 └── docs/
     ├── setup.md               installation, verified commands, troubleshooting
     ├── architecture.md        data flow and each component's role
