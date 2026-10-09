@@ -99,11 +99,14 @@ numbers in [`docs/results.md`](docs/results.md).
 | `results/station_clusters.png` | K-means clusters and their centroids |
 | `results/k_selection.png` | Elbow and silhouette curves for choosing k |
 
-**`dashboard.html`** — every result above in one static page: headline
-numbers, all tables, the reconciliation, and all six charts, with CSS bar
-strips for the monthly and hourly cycles. Open it in any browser; no server,
-no JavaScript, no build step. Generated straight from `results/*.csv`, so the
-numbers cannot drift from the pipeline output.
+**`dashboard.html`** — every result in one static page: headline
+numbers, the row reconciliation, **safe thresholds (CPCB NAAQS beside WHO
+2021) and per-city exceedances** (which cities exceed which standards, and on
+how many days), all tables, the reconciliation, all six charts, and explainers
+for the daily cycle and the K-means clustering. Open it in any browser; no
+server, no JavaScript, no build step. Generated straight from `results/*.csv`
+by `scripts/make_dashboard.py` (after `scripts/exceedance.py`), so the numbers
+cannot drift from the pipeline output.
 
 ---
 
@@ -242,7 +245,9 @@ air-quality-bda/
 │   ├── download_data.py      API + bulk Parquet
 │   ├── inspect_data.py       schema, units, nulls, value ranges
 │   ├── prepare_sample.py     Parquet → CSV (lossless)
-│   └── pivot_to_wide.py      long → wide reshape
+│   ├── pivot_to_wide.py      long → wide reshape
+│   ├── exceedance.py         per-city NAAQS exceedance analysis
+│   └── make_dashboard.py     regenerates dashboard.html
 │
 ├── mapreduce/
 │   ├── pom.xml
